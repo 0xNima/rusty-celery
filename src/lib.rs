@@ -99,6 +99,7 @@ pub mod task;
 #[cfg(feature = "codegen")]
 mod codegen;
 
+
 /// A procedural macro for generating a [`Task`](crate::task::Task) from a function.
 ///
 /// If the annotated function has a return value, the return value must be a
@@ -207,3 +208,7 @@ extern crate serde;
 
 #[cfg(feature = "codegen")]
 extern crate tokio;
+
+
+pub mod celery_app;
+// pub use celery_app::create_app;
