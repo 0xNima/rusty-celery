@@ -488,7 +488,8 @@ fn args_to_typed_inputs<'a>(
 
 impl ToTokens for Task {
     fn to_tokens(&self, dst: &mut TokenStream) {
-        let krate = quote!(::celery);
+        let _crate = quote!(crate);
+        let krate = quote!(#_crate);
         let export = quote!(#krate::export);
         let vis = &self.visibility;
         let wrapper = self.wrapper.as_ref().unwrap();

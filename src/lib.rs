@@ -211,4 +211,3 @@ extern crate tokio;
 
 
 pub mod celery_app;
-// pub use celery_app::create_app;

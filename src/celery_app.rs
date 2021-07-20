@@ -1,5 +1,3 @@
-#![allow(non_upper_case_globals)]
-
 use anyhow::Result;
 use async_trait::async_trait;
 use crate::prelude::*;
@@ -10,7 +8,8 @@ extern crate dotenv;
 use dotenv::dotenv;
 use std::env;
 
-use crate::task::Signature;
+use teloxide::prelude::*;
+use teloxide::net::Download;
 
 pub async fn create_app() -> Result<std::sync::Arc<crate::Celery<crate::broker::AMQPBroker>>> {
     dotenv().ok();
@@ -18,12 +17,9 @@ pub async fn create_app() -> Result<std::sync::Arc<crate::Celery<crate::broker::
     let my_app = crate::app!(
         broker = AMQPBroker { env::var("AMQP_ADDR").unwrap() },
         tasks = [
-            add,
-            // long_running_task,
-            // bound_task,
+            main_task,
         ],
         task_routes = [
-            "buggy_task" => "buggy-queue",
             "*" => "celery",
         ],
         prefetch_count = 2,
@@ -33,24 +29,25 @@ pub async fn create_app() -> Result<std::sync::Arc<crate::Celery<crate::broker::
     Ok(my_app)
 }
 
-// // Demonstrates a long running IO-bound task. By increasing the prefetch count, an arbitrary
-// // number of these number can execute concurrently.
-// #[task(max_retries = 2)]
-// pub async fn long_running_task(secs: Option<u64>) {
-//     let secs = secs.unwrap_or(10);
-//     time::sleep(Duration::from_secs(secs)).await;
-// }
 
-// // Demonstrates a task that is bound to the task instance, i.e. runs as an instance method.
-// #[task(bind = true)]
-// pub fn bound_task(task: &Self) {
-//     // Print some info about the request for debugging.
-//     println!("{:?}", task.request.origin);
-//     println!("{:?}", task.request.hostname);
-// }
-
-// This generates the task struct and impl with the name set to the function name "add"
 #[crate::task]
-pub fn add(x: i32, y: i32) -> TaskResult<i32> {
-    Ok(x + y)
+pub async fn main_task(sticker_name: std::string::String) {
+    println!(">>>>>> {}", sticker_name);
+    let bot = Bot::from_env().auto_send();
+    let set = bot.get_sticker_set(sticker_name).send().await.unwrap();
+    let mut tasks: Vec<_> = Vec::new();
+    for _sticker in &set.stickers {
+        tasks.push(download_sticker(_sticker, &bot));
+    }
+    tokio::join!(futures::future::join_all(tasks));
+}
+
+
+async fn download_sticker(sticker: &teloxide::types::Sticker, bot: &AutoSend<teloxide::Bot>) { //-> Result<(), Error> {
+    let mut file = tokio::fs::File::create(format!("media/{}.webp", &sticker.file_unique_id)).await.unwrap();
+    let dl = &bot.get_file(&sticker.file_id).send().await.unwrap();
+    bot.download_file(&dl.file_path, &mut file).await.unwrap();
+   
+    println!("{:?}", dl.file_path);
+    // Ok(())
 }

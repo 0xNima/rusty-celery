@@ -26,7 +26,6 @@ name = "celery_app"
 [dependencies]
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde"] }
-tokio = { version = "1.0.0", features = ["full"]}
 tokio-stream = "0.1.0"
 serde = { version = "1.0", features = ["derive"]}
 serde_json = "1.0"
@@ -38,7 +37,6 @@ thiserror = "1.0"
 async-trait = "0.1"
 lapin = "1.6.5"
 tokio-amqp = "1.0.0"
-log = "0.4"
 futures = { version = "0.3", features = ["async-await"] }
 uuid = { version = "0.8", features = ["v4"]}
 rand = "0.8"
@@ -51,7 +49,12 @@ dotenv = "0.15.0"
 env_logger = "0.8"
 anyhow = "1.0"
 structopt = "0.3"
-
+actix-web = "4.0.0-beta.8"
+teloxide = { version = "0.4", features = ["auto-send", "macros"] }
+log = "0.4.8"
+pretty_env_logger = "0.4.0"
+tokio = { version = "1.8.1", features = ["full"]}
+actix-rt = "2.2.0"
 redis = { version="0.20.0", features=["connection-manager", "tokio-comp"] }
 
 [features]

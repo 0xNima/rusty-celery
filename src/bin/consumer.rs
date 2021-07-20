@@ -17,8 +17,8 @@ async fn main() -> Result<()> {
     let my_app = create_app().await.unwrap();
 
     my_app.display_pretty().await;
-    my_app.consume_from(&["celery", "buggy-queue"]).await?;
-    my_app.consume().await?;
+    my_app.consume_from(&["celery"]).await?;
 
     Ok(())
 }
+
